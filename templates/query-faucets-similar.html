@@ -1,0 +1,108 @@
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+        margin-top: 3em;
+        margin-bottom: 3em;
+    }
+
+    .hero-faucet-container {
+        margin-bottom: 20px; /* Space between the hero image and the grid */
+        text-align: center; /* Center the image */
+    }
+
+    .hero-faucet-container img {
+        width: 300px; /* Make the hero image larger */
+        height: 300px;
+        padding: 1em;
+        object-fit: contain; /* Ensure the image maintains aspect ratio */
+        border: 2px solid #ccc; /* Add a border around the hero image */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Slight shadow for depth */
+    }
+  
+    .container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Defines a 3-column grid */
+        gap: 20px; /* Space between the grid items */
+        width: 90%; /* Takes up 90% of its parent's width */
+        max-width: 650px; /* Maximum width of the container */
+        border: 2px solid #ccc; /* Frame around the grid */
+        padding: 10px; /* Some space between the frame and the grid items */
+    }
+  
+    .faucet {
+        border: 1px solid #e0e0e0; /* Subtle border around each faucet */
+        padding: 10px; /* Padding inside each faucet */
+        text-align: center; /* Center the buttons and image */
+    }
+  
+    .faucet img {
+        max-width: 100%; /* Ensures the image doesn't overflow its container */
+        object-fit: contain; /* Keeps the image's aspect ratio while fitting within the container */
+    }
+  
+    .faucet-buttons {
+        margin-top: 10px; /* Space between the image and the buttons */
+    }
+  
+    .faucet-buttons a {
+        text-decoration: none; /* Remove underlines from links */
+        background-color: #f0f0f0; /* Background color for buttons */
+        padding: 5px 10px; /* Padding for buttons */
+        margin: 5px; /* Space between the buttons */
+        border-radius: 5px; /* Rounded corners for buttons */
+        display: inline-block; /* To apply padding and margin */
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0; /* Ensure it spans the entire width of the viewport */
+        width: 100%;
+        padding: 10px 0;
+        background-color: #f9f9f9; /* Light gray background for contrast */
+        text-align: center; /* Center the content */
+        z-index: 1000; /* Ensure it's above other content */
+    }
+
+    footer a {
+        text-decoration: none; /* Remove underlines from links */
+        color: #333; /* Dark color for the link */
+    }
+
+    footer a:hover {
+        text-decoration: underline; /* Underline on hover for better UX */
+    }
+  </style>
+  
+<div class="hero-faucet-container">
+{% for row in sql("SELECT * FROM faucets WHERE embedding_id = '" ~ named_parameter_values['input_faucet'] ~ "' LIMIT 1;") %}
+    <img src="{{ row['image_url'] }}" alt="Hero Faucet">
+    <div class="faucet-buttons">
+        <a href="{{ row['product_url'] }}">Product Page</a>
+        <a href="/">Reset</a>
+    </div>
+{% endfor %}
+</div>
+
+<div class="container">
+{% for row in rows %}
+<div class="faucet">
+    <a href="/faucets/similar?input_faucet={{ row['embedding_id'] }}"><img src="{{ row['image_url'] }}" width="200" height="200"></a>
+    <div class="faucet-buttons">
+        <a href="/faucets/similar?input_faucet={{ row['embedding_id'] }}">Find Similar</a>
+        <a href="{{ row['product_url'] }}">Product Page</a>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<footer>
+    By <a href="https://dbreunig.com" target="_blank">Drew Breunig</a>
+</footer>
+  

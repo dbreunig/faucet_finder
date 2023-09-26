@@ -1,0 +1,31 @@
+{
+  "title": "Faucet Finder",
+  "description": "Using embeddings to find faucets that look similar.",
+  "databases": {
+    "faucets": {
+      "queries": {
+        "sample": {
+          "hide_sql": true,
+          "sql": "SELECT e.id, f.image_url, f.product_url FROM embeddings e JOIN faucets f ON e.id = f.embedding_id ORDER BY RANDOM() LIMIT 9;"
+        },
+        "similar": {
+          "hide_sql": true,
+          "sql": "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION by brand ORDER BY title) AS rn FROM (WITH related AS (SELECT value FROM json_each(faiss_search('faucets', 'embeddings', (SELECT embedding FROM embeddings WHERE id = :input_faucet), 200))) SELECT * FROM related, faucets WHERE related.value = faucets.embedding_id) as similar) WHERE rn = 1"
+        }
+      }
+    }
+  },
+  "plugins": {
+    "datasette-faiss": {
+      "tables": [
+        [
+          "faucets",
+          "embeddings"
+        ]
+      ]
+    },
+    "datasette-scale-to-zero": {
+      "duration": "10m"
+    }
+  }
+}
